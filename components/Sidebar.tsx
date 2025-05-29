@@ -2,11 +2,11 @@
 
 import React from "react";
 import Image from "next/image";
-import { FaTachometerAlt, FaBoxOpen } from "react-icons/fa";
+import { FaTachometerAlt, FaBoxOpen, FaUser, FaClipboardList } from "react-icons/fa";
 
 const Sidebar = () => {
   return (
-    <aside className="w-45 bg-gray-900 text-white flex flex-col items-center justify-between py-4">
+    <aside className="w-45 bg-[#2C3E50] text-white flex flex-col items-center justify-between py-4">
       <div className="flex flex-col items-center gap-4">
         {/* Logo */}
         <div className="flex items-center">
@@ -14,7 +14,7 @@ const Sidebar = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col gap-4 text-lg font-semibold mt-6">
+        <nav className="flex flex-col gap-6 text-lg font-semibold mt-6">
           <a href="/Dashboard" className="flex items-center gap-2 hover:underline">
             <FaTachometerAlt /> Dashboard
           </a>
@@ -22,16 +22,13 @@ const Sidebar = () => {
             <FaBoxOpen /> Produk
           </a>
           <a href="/Pengguna" className="flex items-center gap-2 hover:underline">
-            <FaBoxOpen /> Pengguna
+            <FaUser /> Pengguna
           </a>
           <a href="/Pesanan" className="flex items-center gap-2 hover:underline">
-            <FaBoxOpen /> Pesanan
+            <FaClipboardList /> Pesanan
           </a>
         </nav>
       </div>
-
-      {/* Logout */}
-      <button className="text-sm text-white hover:underline">Logout</button>
     </aside>
   );
 };
