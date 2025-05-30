@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import ProfileModal from '@/components/ProfileModal';
+import { MaterialReactTable, MRT_ColumnDef } from 'material-react-table';
 
 type Order = {
   id: number;
@@ -97,6 +98,62 @@ const PesananPage = () => {
     setDummyOrders(updatedOrders);
   };
 
+  const deleteOrder = (itemId: number) => {
+    setDummyOrders((prev) => prev.filter((order) => order.item_id !== itemId));
+  };
+
+  const columns = useMemo<MRT_ColumnDef<Order>[]>(() => [
+    {
+      accessorKey: 'id',
+      header: 'Id Pesanan',
+    },
+    {
+      accessorKey: 'name',
+      header: 'Nama',
+    },
+    {
+      accessorKey: 'hargatotal',
+      header: 'Harga Total',
+    },
+    {
+      accessorKey: 'phone',
+      header: 'No. Telp',
+    },
+    {
+      accessorKey: 'address',
+      header: 'Alamat',
+    },
+    {
+      accessorKey: 'unit',
+      header: 'Status',
+      Cell: ({ row }) => (
+        <select
+          value={row.original.unit}
+          onChange={(e) => updateUnit(row.original.item_id, e.target.value)}
+          className="border rounded px-2 py-1"
+        >
+          <option value="Menunggu">Menunggu</option>
+          <option value="Diproses">Diproses</option>
+          <option value="Diantar">Diantar</option>
+          <option value="Selesai">Selesai</option>
+          <option value="Dibatalkan">Dibatalkan</option>
+          <option value="Dikembalikan">Dikembalikan</option>
+        </select>
+      ),
+    },
+    {
+      header: 'Aksi',
+      Cell: ({ row }) => (
+        <button
+          onClick={() => deleteOrder(row.original.item_id)}
+          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+        >
+          Delete
+        </button>
+      ),
+    },
+  ], [dummyOrders]);
+
   return (
     <div className="flex h-screen bg-gray-900 text-black">
       <Sidebar />
@@ -107,68 +164,21 @@ const PesananPage = () => {
         <div className="p-6">
           <h2 className="text-2xl font-semibold mt-6">Data Pesanan</h2>
 
-          <div className="flex justify-center mt-4">
-            <div className="w-full max-w-xl flex">
-              <input
-                type="text"
-                placeholder="Cari Data..."
-                className="w-full border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button className="bg-gray-300 rounded-r-md px-4 py-2 hover:bg-gray-400">
-                🔍
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-6 overflow-x-auto">
-            <table className="min-w-full border border-gray-300">
-              <thead>
-                <tr className="bg-gray-300 text-black text-left">
-                  <th className="px-4 py-2">Id Pesanan</th>
-                  <th className="px-4 py-2">Nama</th>
-                  <th className="px-4 py-2">Detail Pesanan</th>
-                  <th className="px-4 py-2">Harga Total</th>
-                  <th className="px-4 py-2">No.Telp</th>
-                  <th className="px-4 py-2">Alamat</th>
-                  <th className="px-4 py-2">Status</th>
-                  <th className="px-4 py-2">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dummyOrders.map((order, index) => (
-                  <tr
-                    key={order.id}
-                    className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
-                  >
-                    <td className="px-4 py-2">{order.id}</td>
-                    <td className="px-4 py-2">{order.name}</td>
-                    <td className="px-4 py-2">-</td>
-                    <td className="px-4 py-2">{order.hargatotal}</td>
-                    <td className="px-4 py-2">{order.phone}</td>
-                    <td className="px-4 py-2">{order.address}</td>
-                    <td className="px-4 py-2">
-                      <select
-                        className="border rounded px-2 py-1"
-                        value={order.unit}
-                        onChange={(e) => updateUnit(order.item_id, e.target.value)}
-                      >
-                        <option value="Menunggu">Menunggu</option>
-                        <option value="Diproses">Diproses</option>
-                        <option value="Diantar">Diantar</option>
-                        <option value="Selesai">Selesai</option>
-                        <option value="Dibatalkan">Dibatalkan</option>
-                        <option value="Dikembalikan">Dikembalikan</option>
-                      </select>
-                    </td>
-                    <td className="px-4 py-2">
-                      <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-6">
+            <MaterialReactTable
+              columns={columns}
+              data={dummyOrders}
+              enableColumnFilters={false}
+              enableSorting
+              enablePagination
+              muiTableBodyProps={{
+                sx: {
+                  '& tr:nth-of-type(odd)': {
+                    backgroundColor: '#f9f9f9',
+                  },
+                },
+              }}
+            />
           </div>
         </div>
       </main>
