@@ -1,25 +1,41 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import ProfileModal from '@/components/ProfileModal';
 import { MaterialReactTable, MRT_ColumnDef } from 'material-react-table';
+import axios from 'axios';
 
-const dummyUsers = [
-  { id: 1, name: 'Arum Rahmadhani', email: 'araaa852@gmail.com', phone: '08123456789', address: 'Pasuruan' },
-  { id: 2, name: 'Arum Rahmadhani', email: 'araaa852@gmail.com', phone: '08123456789', address: 'Pasuruan' },
-  { id: 3, name: 'Arum Rahmadhani', email: 'araaa852@gmail.com', phone: '08123456789', address: 'Pasuruan' },
-  { id: 4, name: 'Arum Rahmadhani', email: 'araaa852@gmail.com', phone: '08123456789', address: 'Pasuruan' },
-  { id: 5, name: 'Arum Rahmadhani', email: 'araaa852@gmail.com', phone: '08123456789', address: 'Pasuruan' },
-  { id: 6, name: 'Arum Rahmadhani', email: 'araaa852@gmail.com', phone: '08123456789', address: 'Pasuruan' },
-];
-
-type User = typeof dummyUsers[0];
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+};
 
 const PenggunaPage = () => {
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showProfile, setShowProfile] = useState(false);
+
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  axios.get('http://localhost:8000/api/admin/users', {
+    headers: {
+      Authorization: `Bearer ${token}`, // jika pakai auth
+    }
+  })
+    .then(res => {
+      setUsers(res.data); // <-- set state pengguna
+    })
+    .catch(err => {
+      console.error("Gagal fetch data pengguna:", err);
+    });
+}, []);
+
 
   const columns = useMemo<MRT_ColumnDef<User>[]>(
     () => [
@@ -34,13 +50,13 @@ const PenggunaPage = () => {
 
   const filteredUsers = useMemo(
     () =>
-      dummyUsers.filter((user) =>
+      users.filter((user) =>
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.phone.includes(searchTerm) ||
         user.address.toLowerCase().includes(searchTerm.toLowerCase())
       ),
-    [searchTerm]
+    [searchTerm, users]
   );
 
   return (

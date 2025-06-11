@@ -1,58 +1,81 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import ProfileModal from "@/components/ProfileModal";
 import Image from "next/image";
-
-const dataCards = [
-  {
-    title: "Jenis Produk",
-    icon: (
-      <Image
-        src="/package.png"
-        alt="Jenis Produk"
-        width={90}
-        height={0}
-      />
-    ),
-    value: 50,
-    color: "bg-yellow-500",
-    headerColor: "bg-yellow-600",
-  },
-  {
-    title: "Total Pengguna",
-    icon: (
-      <Image
-        src="/User.png"
-        alt="Total Pengguna"
-        width={70}
-        height={70}
-      />
-    ),
-    value: 50,
-    color: "bg-lime-400",
-    headerColor: "bg-lime-600",
-  },
-  {
-    title: "Pesanan",
-    icon: (
-      <Image
-        src="/Inbox.png"
-        alt="Pesanan"
-        width={70}
-        height={70}
-      />
-    ),
-    value: 50,
-    color: "bg-blue-600",
-    headerColor: "bg-blue-500",
-  },
-];
+import axios from "axios";
 
 const DashboardPage = () => {
   const [showProfile, setShowProfile] = useState(false);
+  const [dashboardData, setDashboardData] = useState({
+    total_produk: 0,
+    total_user: 0,
+    total_pesanan: 0,
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    axios.get("http://localhost:8000/api/admin/dashboard", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((res) => {
+      setDashboardData(res.data);
+    })
+    .catch((err) => {
+      console.error("Gagal fetch data dashboard:", err);
+    });
+  }, []);
+
+  const dataCards = [
+    {
+      title: "Jenis Produk",
+      icon: (
+        <Image
+          src="/package.png"
+          alt="Jenis Produk"
+          width={90}
+          height={0}
+        />
+      ),
+      value: dashboardData.total_produk,
+      color: "bg-yellow-500",
+      headerColor: "bg-yellow-600",
+    },
+    {
+      title: "Total Pengguna",
+      icon: (
+        <Image
+          src="/User.png"
+          alt="Total Pengguna"
+          width={70}
+          height={70}
+        />
+      ),
+      value: dashboardData.total_user,
+      color: "bg-lime-400",
+      headerColor: "bg-lime-600",
+    },
+    {
+      title: "Pesanan",
+      icon: (
+        <Image
+          src="/Inbox.png"
+          alt="Pesanan"
+          width={70}
+          height={70}
+        />
+      ),
+      value: dashboardData.total_pesanan,
+      color: "bg-blue-600",
+      headerColor: "bg-blue-500",
+    },
+  ];
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -81,6 +104,7 @@ const DashboardPage = () => {
             ))}
           </div>
         </main>
+        
         {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
       </div>
     </div>

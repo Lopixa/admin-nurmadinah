@@ -1,105 +1,80 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import ProfileModal from '@/components/ProfileModal';
 import { MaterialReactTable, MRT_ColumnDef } from 'material-react-table';
+import axios from 'axios';
 
 type Order = {
   id: number;
-  item_id: number;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  hargatotal: string;
+  nama_toko: string;
+  no_hp: string;
+  alamat: string;
   status: string;
-  unit: string;
+  total: string;
 };
-
-const dummyOrdersInitial: Order[] = [
-  {
-    id: 1,
-    item_id: 101,
-    name: 'Arum Rahmadhani',
-    email: 'araaa852@gmail.com',
-    phone: '08123456789',
-    address: 'Pasuruan',
-    hargatotal: 'Rp 50.000',
-    status: 'Menunggu',
-    unit: 'Menunggu',
-  },
-  {
-    id: 2,
-    item_id: 102,
-    name: 'Arum Rahmadhani',
-    email: 'araaa852@gmail.com',
-    phone: '08123456789',
-    address: 'Pasuruan',
-    hargatotal: 'Rp 70.000',
-    status: 'Diproses',
-    unit: 'Diproses',
-  },
-  {
-    id: 3,
-    item_id: 103,
-    name: 'Arum Rahmadhani',
-    email: 'araaa852@gmail.com',
-    phone: '08123456789',
-    address: 'Pasuruan',
-    hargatotal: 'Rp 100.000',
-    status: 'Diantar',
-    unit: 'Diantar',
-  },
-  {
-    id: 4,
-    item_id: 104,
-    name: 'Arum Rahmadhani',
-    email: 'araaa852@gmail.com',
-    phone: '08123456789',
-    address: 'Pasuruan',
-    hargatotal: 'Rp 25.000',
-    status: 'Selesai',
-    unit: 'Selesai',
-  },
-  {
-    id: 5,
-    item_id: 105,
-    name: 'Arum Rahmadhani',
-    email: 'araaa852@gmail.com',
-    phone: '08123456789',
-    address: 'Pasuruan',
-    hargatotal: 'Rp 90.000',
-    status: 'Dibatalkan',
-    unit: 'Dibatalkan',
-  },
-  {
-    id: 6,
-    item_id: 106,
-    name: 'Arum Rahmadhani',
-    email: 'araaa852@gmail.com',
-    phone: '08123456789',
-    address: 'Pasuruan',
-    hargatotal: 'Rp 30.000',
-    status: 'Dikembalikan',
-    unit: 'Dikembalikan',
-  },
-];
 
 const PesananPage = () => {
   const [showProfile, setShowProfile] = useState(false);
-  const [dummyOrders, setDummyOrders] = useState<Order[]>(dummyOrdersInitial);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const updateUnit = (itemId: number, newStatus: string) => {
-    const updatedOrders = dummyOrders.map((order) =>
-      order.item_id === itemId ? { ...order, unit: newStatus } : order
-    );
-    setDummyOrders(updatedOrders);
+  const fetchOrders = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:8000/api/pesanan', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setOrders(res.data.data || res.data);
+    } catch (error) {
+      console.error('Gagal mengambil pesanan:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteOrder = (itemId: number) => {
-    setDummyOrders((prev) => prev.filter((order) => order.item_id !== itemId));
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const updateUnit = async (orderId: number, newStatus: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `http://localhost:8000/api/pesanan/${orderId}/status`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+    } catch (error) {
+      console.error('Gagal memperbarui status:', error);
+    }
+  };
+
+  const deleteOrder = async (orderId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:8000/api/pesanan/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setOrders((prev) => prev.filter((order) => order.id !== orderId));
+    } catch (error) {
+      console.error('Gagal menghapus pesanan:', error);
+    }
   };
 
   const columns = useMemo<MRT_ColumnDef<Order>[]>(() => [
@@ -108,36 +83,42 @@ const PesananPage = () => {
       header: 'Id Pesanan',
     },
     {
-      accessorKey: 'name',
+      accessorKey: 'nama_toko',
       header: 'Nama',
     },
     {
-      accessorKey: 'hargatotal',
+      accessorKey: 'total',
       header: 'Harga Total',
+      Cell: ({ row }) => {
+        const details = row.original as any;
+        // Hitung total dari detail pesanan
+        const total = details?.details?.reduce((acc: number, item: any) => acc + (item.harga * item.jumlah), 0);
+        return <>{total ? `Rp ${total.toLocaleString()}` : '-'}</>;
+      }
     },
     {
-      accessorKey: 'phone',
+      accessorKey: 'no_hp',
       header: 'No. Telp',
     },
     {
-      accessorKey: 'address',
+      accessorKey: 'alamat',
       header: 'Alamat',
     },
     {
-      accessorKey: 'unit',
+      accessorKey: 'status',
       header: 'Status',
       Cell: ({ row }) => (
         <select
-          value={row.original.unit}
-          onChange={(e) => updateUnit(row.original.item_id, e.target.value)}
+          value={row.original.status}
+          onChange={(e) => updateUnit(row.original.id, e.target.value)}
           className="border rounded px-2 py-1"
         >
-          <option value="Menunggu">Menunggu</option>
-          <option value="Diproses">Diproses</option>
-          <option value="Diantar">Diantar</option>
-          <option value="Selesai">Selesai</option>
-          <option value="Dibatalkan">Dibatalkan</option>
-          <option value="Dikembalikan">Dikembalikan</option>
+          <option value="pending">Menunggu</option>
+          <option value="processing">Diproses</option>
+          <option value="delivered">Diantar</option>
+          <option value="completed">Selesai</option>
+          <option value="canceled">Dibatalkan</option>
+          <option value="returned">Dikembalikan</option>
         </select>
       ),
     },
@@ -145,14 +126,14 @@ const PesananPage = () => {
       header: 'Aksi',
       Cell: ({ row }) => (
         <button
-          onClick={() => deleteOrder(row.original.item_id)}
+          onClick={() => deleteOrder(row.original.id)}
           className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
         >
           Delete
         </button>
       ),
     },
-  ], [dummyOrders]);
+  ], [orders]);
 
   return (
     <div className="flex h-screen bg-gray-900 text-black">
@@ -165,20 +146,24 @@ const PesananPage = () => {
           <h2 className="text-2xl font-semibold mt-6">Data Pesanan</h2>
 
           <div className="mt-6">
-            <MaterialReactTable
-              columns={columns}
-              data={dummyOrders}
-              enableColumnFilters={false}
-              enableSorting
-              enablePagination
-              muiTableBodyProps={{
-                sx: {
-                  '& tr:nth-of-type(odd)': {
-                    backgroundColor: '#f9f9f9',
+            {loading ? (
+              <p>Memuat data pesanan...</p>
+            ) : (
+              <MaterialReactTable
+                columns={columns}
+                data={orders}
+                enableColumnFilters={false}
+                enableSorting
+                enablePagination
+                muiTableBodyProps={{
+                  sx: {
+                    '& tr:nth-of-type(odd)': {
+                      backgroundColor: '#f9f9f9',
+                    },
                   },
-                },
-              }}
-            />
+                }}
+              />
+            )}
           </div>
         </div>
       </main>
