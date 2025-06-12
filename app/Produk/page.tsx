@@ -7,7 +7,7 @@ import ProfileModal from '@/components/ProfileModal';
 import TambahBarang from './TambahBarang';
 import { FaPen, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
-
+import { useRouter } from 'next/navigation';
 
 type Product = {
   id: number;
@@ -19,6 +19,7 @@ type Product = {
 
 
 const ProdukPage = () => {
+  const router = useRouter();
   const [showProfile, setShowProfile] = useState(false);
   const [showTambah, setShowTambah] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,6 +28,9 @@ const ProdukPage = () => {
   const fetchProducts = async () => {
   try {
     const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/Signin"); // redirect kalau belum login
+      }
     const res = await axios.get("http://localhost:8000/api/barang", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -103,7 +107,7 @@ const ProdukPage = () => {
             {products.map((product: any) => (
               <div
                 key={product.id}
-                className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center text-center"
+                className="bg-white p-4 border-2 border-yellow-500 rounded-lg shadow-md flex flex-col items-center text-center"
               >
                 <img
                   src={product.image_url || '/placeholder.png'}

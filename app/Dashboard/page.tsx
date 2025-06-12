@@ -6,8 +6,10 @@ import Header from "@/components/Header";
 import ProfileModal from "@/components/ProfileModal";
 import Image from "next/image";
 import axios from "axios";
+import { useRouter } from 'next/navigation';
 
 const DashboardPage = () => {
+  const router = useRouter();
   const [showProfile, setShowProfile] = useState(false);
   const [dashboardData, setDashboardData] = useState({
     total_produk: 0,
@@ -17,7 +19,9 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) {
+      router.push("/Signin"); // redirect kalau belum login
+    }
 
     axios.get("http://localhost:8000/api/admin/dashboard", {
       headers: {
@@ -78,13 +82,13 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-200">
       <Sidebar />
 
       <div className="flex-1 flex flex-col">
         <Header onProfileClick={() => setShowProfile(true)} />
 
-        <main className="p-8">
+        <main className="bg-white p-8 mx-6 my-6 rounded-xl shadow-lg">
           <h1 className="text-2xl font-bold mb-6 text-black">Dashboard</h1>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

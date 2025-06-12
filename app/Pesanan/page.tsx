@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import ProfileModal from '@/components/ProfileModal';
 import { MaterialReactTable, MRT_ColumnDef } from 'material-react-table';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 type Order = {
   id: number;
@@ -17,13 +18,17 @@ type Order = {
 };
 
 const PesananPage = () => {
+  const router = useRouter();
   const [showProfile, setShowProfile] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/Signin"); // redirect kalau belum login
+      }
       const res = await axios.get('http://localhost:8000/api/pesanan', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -87,6 +92,25 @@ const PesananPage = () => {
       header: 'Nama',
     },
     {
+  accessorKey: 'orders',
+  header: 'List Barang',
+  Cell: ({ cell }) => {
+    let value = cell.getValue();
+    try {
+      if (typeof value === 'string') {
+        value = JSON.parse(value);
+      }
+    } catch {
+      value = [];
+    }
+
+    const orders = Array.isArray(value) ? value : [];
+
+    return orders.map((item: any) => item.name).join(', ');
+  },
+},
+
+    {
       accessorKey: 'total',
       header: 'Harga Total',
       Cell: ({ row }) => {
@@ -139,10 +163,10 @@ const PesananPage = () => {
     <div className="flex h-screen bg-gray-900 text-black">
       <Sidebar />
 
-      <main className="flex-1 bg-white relative overflow-y-auto">
+      <main className="flex-1 bg-gray-200 relative overflow-y-auto">
         <Header onProfileClick={() => setShowProfile(true)} />
 
-        <div className="p-6">
+        <div className="mx-6 my-6 bg-white p-6 rounded-xl shadow-lg">
           <h2 className="text-2xl font-semibold mt-6">Data Pesanan</h2>
 
           <div className="mt-6">

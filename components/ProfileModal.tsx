@@ -6,6 +6,13 @@ interface ProfileModalProps {
   onClose: () => void
 }
 
+
+const handleLogout = () => {
+  // Contoh: hapus token dari localStorage dan redirect ke halaman login
+  localStorage.removeItem('token')
+  window.location.href = '/Signin' 
+}
+
 export default function ProfileModal({ onClose }: ProfileModalProps) {
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -66,8 +73,11 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
           >
             Tutup
           </button>
-          <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded flex items-center gap-2">
-            Logout <FaSignOutAlt />
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded flex items-center gap-2"
+          >
+            Logout <FaSignOutAlt />
           </button>
         </div>
       </div>

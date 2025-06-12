@@ -78,8 +78,16 @@ export default function TambahBarangModal({ onClose, selectedProduct }: TambahBa
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="flex justify-center">
             <label htmlFor="image-upload" className="cursor-pointer">
-              <div className="w-24 h-24 border-2 border-orange-400 rounded-lg flex items-center justify-center text-3xl text-gray-500">
-                <FaCamera />
+              <div className="w-24 h-24 border-2 border-orange-400 rounded-lg flex items-center justify-center overflow-hidden bg-gray-100">
+                {image ? (
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Preview"
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <FaCamera className="text-3xl text-gray-500" />
+                )}
               </div>
               <input
                 id="image-upload"
