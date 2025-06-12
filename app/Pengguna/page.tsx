@@ -28,7 +28,7 @@ const PenggunaPage = () => {
         router.push("/Signin"); // redirect kalau belum login
       }
 
-  axios.get('http://localhost:8000/api/admin/users', {
+  axios.get('http://54.90.134.63:8000/api/admin/users', {
     headers: {
       Authorization: `Bearer ${token}`, // jika pakai auth
     }

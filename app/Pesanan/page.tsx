@@ -29,7 +29,7 @@ const PesananPage = () => {
       if (!token) {
         router.push("/Signin"); // redirect kalau belum login
       }
-      const res = await axios.get('http://localhost:8000/api/pesanan', {
+      const res = await axios.get('http://54.90.134.63:8000/api/pesanan', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -50,7 +50,7 @@ const PesananPage = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:8000/api/pesanan/${orderId}/status`,
+        `http://54.90.134.63:8000/api/pesanan/${orderId}/status`,
         { status: newStatus },
         {
           headers: {
@@ -71,7 +71,7 @@ const PesananPage = () => {
   const deleteOrder = async (orderId: number) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:8000/api/pesanan/${orderId}`, {
+      await axios.delete(`http://54.90.134.63:8000/api/pesanan/${orderId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

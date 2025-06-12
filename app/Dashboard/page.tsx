@@ -23,7 +23,7 @@ const DashboardPage = () => {
       router.push("/Signin"); // redirect kalau belum login
     }
 
-    axios.get("http://localhost:8000/api/admin/dashboard", {
+    axios.get("http://54.90.134.63:8000/api/admin/dashboard", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

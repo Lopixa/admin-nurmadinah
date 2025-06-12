@@ -47,7 +47,7 @@ export default function TambahBarangModal({ onClose, selectedProduct }: TambahBa
     try {
       if (selectedProduct) {
         // Edit barang
-        await axios.post(`http://localhost:8000/api/barang/${selectedProduct.id}?_method=PUT`, formData, {
+        await axios.post(`http://54.90.134.63:8000/api/barang/${selectedProduct.id}?_method=PUT`, formData, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
@@ -55,7 +55,7 @@ export default function TambahBarangModal({ onClose, selectedProduct }: TambahBa
         });
       } else {
         // Tambah barang
-        await axios.post('http://localhost:8000/api/barang', formData, {
+        await axios.post('http://54.90.134.63:8000/api/barang', formData, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
