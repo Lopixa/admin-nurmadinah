@@ -41,7 +41,7 @@ const DashboardPage = () => {
       title: "Jenis Produk",
       icon: (
         <Image
-          src="/package.png"
+          src="/Package.png"
           alt="Jenis Produk"
           width={90}
           height={0}
